@@ -25,6 +25,10 @@ const getUser = async (req, res) => {
     const userRef = db.collection('users').doc(id)
     const userData = await userRef.get()
 
+    if (!userData.data()) {
+      return res.status(404).send("User tidak ditemukan")
+    }
+
     return res.status(200).send(userData.data())
   } catch (error) {
     console.log(error)
@@ -35,9 +39,10 @@ const getUser = async (req, res) => {
 // signup user
 const createUserToAuthAndFirestore = async (req, res) => {
   try {
-    const { email, password } = req.body
+    const { name, email, password } = req.body
 
     const user = {
+      name: name,
       email: email,
       password: password
     }
@@ -45,7 +50,7 @@ const createUserToAuthAndFirestore = async (req, res) => {
     const authResponse = await admin.auth().createUser(user);
     const firestoreResponse = await db.collection('users').doc(authResponse.uid).set(user)
 
-    const response = { authResponse, firestoreResponse }
+    const response = { ...user, authResponse, firestoreResponse }
 
     return res.status(200).send(response)
   } catch (error) {
