@@ -10,7 +10,7 @@
 // }
 // module.exports = new Middleware();
 
-const admin = require('../firebase/firebase-service');
+const { admin } = require('../firebase/firebase-service');
 const requireAuth = async (req, res, next) => {
   // verify user is authenticated
   const { authorization } = req.headers
@@ -30,7 +30,8 @@ const requireAuth = async (req, res, next) => {
     }
     return res.status(401).json({ message: 'Unauthorized' });
   } catch (e) {
-    return res.status(500).json({ message: 'Internal Error' });
+    // return res.status(500).json({ message: 'Internal Error' });
+    return res.status(500).json({ message: e.message });
   }
 }
 
