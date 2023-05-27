@@ -27,7 +27,7 @@ const getUserHistory = async (req, res) => {
     let histories = []
     snapshot.forEach(doc => {
       // console.log(doc.id, '=>', doc.data());
-      histories.push(doc.data())
+      histories.push({ id: doc.id, ...doc.data() })
     });
     return res.status(200).send(histories)
   } catch (error) {
@@ -44,7 +44,7 @@ const getHistories = async (req, res) => {
     let histories = []
     snapshot.forEach(doc => {
       // console.log(doc.id, '=>', doc.data());
-      histories.push(doc.data())
+      histories.push({ id: doc.id, ...doc.data() })
     });
     return res.status(200).send(histories)
   } catch (error) {

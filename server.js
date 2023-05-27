@@ -18,10 +18,12 @@ app.use((req, res, next) => {
 })
 
 // routes
-// app.use('/api/workouts', workoutRoutes)
 app.use('/api/user', userRoutes)
 app.use('/api/history', historyRoutes)
-
+app.get('/api/scan', (req, res) => {
+  const imgurl = req.params
+  return res.status(200).json("halo")
+})
 
 // NYOBA
 // const requireAuth = require('./middleware/requireAuth')
@@ -33,15 +35,3 @@ app.use('/api/history', historyRoutes)
 app.listen(process.env.PORT, () => {
   console.log('connected to db & listening on port', process.env.PORT)
 })
-
-// connect to db
-// mongoose.connect(process.env.MONGO_URI)
-//   .then(() => {
-//     // listen for requests
-//     app.listen(process.env.PORT, () => {
-//       console.log('connected to db & listening on port', process.env.PORT)
-//     })
-//   })
-//   .catch((error) => {
-//     console.log(error)
-//   })

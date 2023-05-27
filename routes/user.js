@@ -15,7 +15,7 @@ const router = express.Router()
 
 router.post('/signup', createUserToAuthAndFirestore)
 
-router.use(requireAuth) // routes-routes berikutnya butuh auth
+router.use(requireAuth)
 
 router.get('/', getUsers)
 router.get('/:id', getUser)

@@ -9,7 +9,7 @@ const getUsers = async (req, res) => {
     let users = []
     snapshot.forEach(doc => {
       // console.log(doc.id, '=>', doc.data());
-      users.push(doc.data())
+      users.push({ id: doc.id, ...doc.data() })
     });
     return res.status(200).send(users)
   } catch (error) {
@@ -29,7 +29,7 @@ const getUser = async (req, res) => {
       return res.status(404).send("User tidak ditemukan")
     }
 
-    return res.status(200).send(userData.data())
+    return res.status(200).send({ id: userRef.id, ...userData.data() })
   } catch (error) {
     console.log(error)
     return res.status(500).send(error.message)
