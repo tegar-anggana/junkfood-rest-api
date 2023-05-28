@@ -1,5 +1,6 @@
 // import admin from './firebase-service';
 const { admin, db, bucket } = require('../firebase/firebase-service')
+const fs = require('fs')
 
 // get all user
 const getUsers = async (req, res) => {
@@ -72,6 +73,13 @@ const updateUser = async (req, res) => {
       await bucket.upload(imgFile.path, { destination: 'profiles/' + id });
       const imgPublicURL = "https://storage.googleapis.com/bangkit-capstone-gar.appspot.com/profiles/" + id;
       newData.photoURL = imgPublicURL;
+
+      // delete temporary image in this express app directory (/uploads)
+      fs.unlink(req.file.path, (err) => {
+        if (err) {
+          console.log(err)
+        }
+      })
     }
 
     if (newData) {
