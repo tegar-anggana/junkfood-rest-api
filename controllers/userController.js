@@ -1,5 +1,5 @@
 // import admin from './firebase-service';
-const { admin, db } = require('../firebase/firebase-service')
+const { admin, db, bucket } = require('../firebase/firebase-service')
 
 // get all user
 const getUsers = async (req, res) => {
@@ -61,26 +61,47 @@ const createUserToAuthAndFirestore = async (req, res) => {
 
 // update user
 const updateUser = async (req, res) => {
-  const { id } = req.params
-  const newData = req.body
+  const { id } = req.params;
   try {
-    const userRef = db.collection('users').doc(id)
-    const firestoreResponse = await userRef.update(newData)
-    let authResponse = ""
-    if (newData.email || newData.password) {
-      authResponse = await admin.auth().updateUser(id, {
-        email: newData.email,
-        password: newData.password
-      })
-    }
-    const response = { authResponse, firestoreResponse }
+    let response = {};
+    const newData = JSON.parse(req.body.data);
 
-    return res.status(200).send(response)
+    if (req.file) {
+      const imgFile = req.file;
+      // Upload the image to cloud storage
+      await bucket.upload(imgFile.path, { destination: 'profiles/' + id });
+      const imgPublicURL = "https://storage.googleapis.com/bangkit-capstone-gar.appspot.com/profiles/" + id;
+      newData.photoURL = imgPublicURL;
+    }
+
+    if (newData) {
+      const userRef = db.collection('users').doc(id);
+
+      // Update Firestore data
+      const firestoreResponse = await userRef.update(newData);
+
+      // Update user authentication information if email or password is provided
+      let authResponse = "";
+      if (newData.email || newData.password) {
+        authResponse = await admin.auth().updateUser(id, {
+          email: newData.email,
+          password: newData.password
+        });
+      }
+
+      response.authResponse = authResponse;
+      response.firestoreResponse = firestoreResponse;
+
+      return res.status(200).send(response);
+    }
+
+    return res.status(200).send('No data provided for update.');
   } catch (error) {
-    console.log(error)
-    return res.status(500).send(error.message)
+    console.error(error);
+    return res.status(500).send(error.message);
   }
 }
+
 
 // delete user
 const deleteUserInAuthAndFirestore = async (req, res) => {
