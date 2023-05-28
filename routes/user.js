@@ -7,13 +7,13 @@ const requireAuth = require('../middleware/requireAuth')
 const multer = require('multer')
 
 const router = express.Router()
+const upload = multer({ dest: 'uploads/' })
 
 // login route
 // router.post('/login', loginUser)
 
 // signup route
 // router.post('/signup', signupUser)
-const upload = multer({ dest: 'uploads/' })
 
 router.post('/signup', createUserToAuthAndFirestore)
 

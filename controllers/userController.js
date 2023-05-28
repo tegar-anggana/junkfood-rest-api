@@ -103,7 +103,7 @@ const updateUser = async (req, res) => {
       return res.status(200).send(response);
     }
 
-    return res.status(200).send('No data provided for update.');
+    return res.status(400).send('No data provided for update.');
   } catch (error) {
     console.error(error);
     return res.status(500).send(error.message);
@@ -115,6 +115,7 @@ const updateUser = async (req, res) => {
 const deleteUserInAuthAndFirestore = async (req, res) => {
   const { id } = req.params
   try {
+    await bucket.file('profiles/' + id).delete()
     const authResponse = await admin.auth().deleteUser(id)
     const firestoreResponse = await db.collection('users').doc(id).delete()
 
