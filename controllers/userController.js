@@ -60,13 +60,19 @@ const createUserToAuthAndFirestore = async (req, res) => {
 }
 
 // update user
-const updateUserInFirestore = async (req, res) => {
+const updateUser = async (req, res) => {
   const { id } = req.params
   const newData = req.body
   try {
     const userRef = db.collection('users').doc(id)
     const firestoreResponse = await userRef.update(newData)
-    const authResponse = await admin.auth().updateUser(id, newData)
+    let authResponse = ""
+    if (newData.email || newData.password) {
+      authResponse = await admin.auth().updateUser(id, {
+        email: newData.email,
+        password: newData.password
+      })
+    }
     const response = { authResponse, firestoreResponse }
 
     return res.status(200).send(response)
@@ -92,4 +98,4 @@ const deleteUserInAuthAndFirestore = async (req, res) => {
   }
 }
 
-module.exports = { createUserToAuthAndFirestore, deleteUserInAuthAndFirestore, getUser, getUsers, updateUserInFirestore }
+module.exports = { createUserToAuthAndFirestore, deleteUserInAuthAndFirestore, getUser, getUsers, updateUser }
