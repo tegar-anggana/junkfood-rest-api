@@ -16,7 +16,7 @@ const createHistory = async (req, res) => {
       // upload img ke cloud storage
       const imgFile = req.file
       await bucket.upload(imgFile.path, { destination: 'histories/' + historyId })
-      const imgPublicURL = "https://storage.googleapis.com/bangkit-capstone-gar.appspot.com/histories/" + historyId;
+      const imgPublicURL = process.env.STORAGE_PUBLIC_URL + "/histories/" + historyId;
       history.photoURL = imgPublicURL
 
       // delete temporary file di express app directory
@@ -88,7 +88,7 @@ const updateHistory = async (req, res) => {
       const imgFile = req.file
 
       await bucket.upload(imgFile.path, { destination: '/histories/' + id })
-      const imgPublicURL = "https://storage.googleapis.com/bangkit-capstone-gar.appspot.com/histories/" + id
+      const imgPublicURL = process.env.STORAGE_PUBLIC_URL + "/histories/" + id
       newData.photoURL = imgPublicURL
 
       // delete temporary image in express dir

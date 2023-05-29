@@ -6,11 +6,11 @@ const { getStorage } = require("firebase-admin/storage")
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  storageBucket: 'bangkit-capstone-gar.appspot.com'
+  storageBucket: process.env.STORAGE_BUCKET
 });
 
 const db = new Firestore({
-  projectId: 'bangkit-capstone-gar',
+  projectId: process.env.PROJECT_ID,
   keyFilename: './firebase/ServiceAccount.json',
 });
 

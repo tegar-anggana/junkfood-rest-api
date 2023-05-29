@@ -1,4 +1,3 @@
-// import admin from './firebase-service';
 const { admin, db, bucket } = require('../firebase/firebase-service')
 const fs = require('fs')
 
@@ -9,13 +8,11 @@ const getUsers = async (req, res) => {
     const snapshot = await usersRef.get()
     let users = []
     snapshot.forEach(doc => {
-      // console.log(doc.id, '=>', doc.data());
-      users.push({ id: doc.id, ...doc.data() })
+      users.push({ id: doc.id, ...doc.data(), })
     });
     return res.status(200).send(users)
-  } catch (error) {
-    console.log(error)
-    return res.status(500).send(error.message)
+  } catch (e) {
+    return res.status(500).send({ error: e.message })
   }
 }
 
@@ -41,7 +38,6 @@ const getUser = async (req, res) => {
 const createUserToAuthAndFirestore = async (req, res) => {
   try {
     const { name, email, password } = req.body
-
     const user = {
       name: name,
       email: email,
@@ -71,7 +67,7 @@ const updateUser = async (req, res) => {
       const imgFile = req.file;
       // Upload the image to cloud storage
       await bucket.upload(imgFile.path, { destination: 'profiles/' + id });
-      const imgPublicURL = "https://storage.googleapis.com/bangkit-capstone-gar.appspot.com/profiles/" + id;
+      const imgPublicURL = process.env.STORAGE_PUBLIC_URL + "/profiles/" + id;
       newData.photoURL = imgPublicURL;
 
       // delete temporary image in this express app directory (/uploads)

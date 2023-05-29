@@ -1,7 +1,5 @@
 const express = require('express')
 
-// controller functions
-// const { loginUser, signupUser } = require('../controllers/userController')
 const { createUserToAuthAndFirestore, deleteUserInAuthAndFirestore, getUser, getUsers, updateUser } = require('../controllers/userController')
 const requireAuth = require('../middleware/requireAuth')
 const multer = require('multer')

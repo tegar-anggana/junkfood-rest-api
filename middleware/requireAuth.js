@@ -1,15 +1,3 @@
-// const admin = require('../config/firebase-config');
-// class Middleware {
-//   async decodeToken(req, res, next) {
-//     if (req.headers.authorization) {
-//       const token = req.headers.authorization.split(' ')[1];
-
-//     }
-//     return res.status(400).json({ message: 'Unauthorized' });
-//   }
-// }
-// module.exports = new Middleware();
-
 const { admin } = require('../firebase/firebase-service');
 const requireAuth = async (req, res, next) => {
   // verify user is authenticated
