@@ -1,5 +1,6 @@
 const { admin, db, bucket } = require('../firebase/firebase-service')
 const fs = require('fs')
+const { URL } = require('url')
 
 // get all user
 const getUsers = async (req, res) => {
@@ -124,7 +125,13 @@ const deleteUserInAuthAndFirestore = async (req, res) => {
     const data = await ref.get()
 
     if (data.data().photoURL) {
-      await bucket.file('profiles/' + id).delete()
+      const publicURL = data.data().photoURL
+      const parsedURL = new URL(publicURL)
+      const path = parsedURL.pathname
+      const segments = path.split('/')
+      const desiredSeg = segments[segments.length - 1]
+
+      await bucket.file(`profiles/${id}/${desiredSeg}`).delete()
     }
 
     const authResponse = await admin.auth().deleteUser(id)

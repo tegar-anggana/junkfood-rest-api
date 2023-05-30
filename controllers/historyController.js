@@ -15,8 +15,9 @@ const createHistory = async (req, res) => {
     if (req.file) {
       // upload img ke cloud storage
       const imgFile = req.file
-      await bucket.upload(imgFile.path, { destination: 'histories/' + historyId })
-      const imgPublicURL = process.env.STORAGE_PUBLIC_URL + "/histories/" + historyId;
+      const destPath = `histories/${id}/${historyId}/` + Date.now()
+      await bucket.upload(imgFile.path, { destination: destPath, public: true })
+      const imgPublicURL = process.env.STORAGE_PUBLIC_URL + `/${destPath}`
       history.photoURL = imgPublicURL
 
       // delete temporary file di express app directory
@@ -79,16 +80,25 @@ const getHistories = async (req, res) => {
 
 // Update satu history
 const updateHistory = async (req, res) => {
-  const { id } = req.params // id history, bukan id user
+  const { userId, histId } = req.params
   try {
     let response = {}
     const newData = JSON.parse(req.body.data)
 
     if (req.file) {
+      // upload img ke cloud storage
       const imgFile = req.file
+      const destPath = `histories/${userId}/${histId}/` + Date.now()
+      const [files] = await bucket.getFiles({ prefix: `histories/${userId}/${histId}` })
 
-      await bucket.upload(imgFile.path, { destination: '/histories/' + id })
-      const imgPublicURL = process.env.STORAGE_PUBLIC_URL + "/histories/" + id
+      if (files.length > 0) {
+        for (const file of files) {
+          await file.delete()
+        }
+      }
+
+      await bucket.upload(imgFile.path, { destination: destPath, public: true })
+      const imgPublicURL = process.env.STORAGE_PUBLIC_URL + `/${destPath}`
       newData.photoURL = imgPublicURL
 
       // delete temporary image in express dir
@@ -100,7 +110,7 @@ const updateHistory = async (req, res) => {
     }
 
     if (newData) {
-      const historyRef = db.collection('histories').doc(id)
+      const historyRef = db.collection('histories').doc(histId)
       const firestoreResponse = await historyRef.update(newData)
       response = { firestoreResponse }
       return res.status(200).send(response)

@@ -19,7 +19,7 @@ router.get('/user/:id', getUserHistory)
 router.get('/', getHistories)
 
 // Update satu history
-router.put('/:id', upload.single('image'), updateHistory)
+router.put('/user/:userId/:histId', upload.single('image'), updateHistory)
 
 // Delete satu history
 router.delete('/:id', deleteHistory)
