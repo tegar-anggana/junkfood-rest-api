@@ -117,8 +117,14 @@ const updateHistory = async (req, res) => {
 const deleteHistory = async (req, res) => {
   const { id } = req.params // id history, bukan id user
   try {
-    await bucket.file('histories/' + id).delete()
-    const firestoreResponse = await db.collection('histories').doc(id).delete()
+    const ref = db.collection('histories').doc(id)
+    const data = await ref.get()
+
+    if (data.data().photoURL) {
+      await bucket.file('histories/' + id).delete()
+    }
+
+    const firestoreResponse = await ref.delete()
 
     const response = { firestoreResponse }
 

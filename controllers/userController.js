@@ -111,9 +111,15 @@ const updateUser = async (req, res) => {
 const deleteUserInAuthAndFirestore = async (req, res) => {
   const { id } = req.params
   try {
-    await bucket.file('profiles/' + id).delete()
+    const ref = db.collection('users').doc(id)
+    const data = await ref.get()
+
+    if (data.data().photoURL) {
+      await bucket.file('profiles/' + id).delete()
+    }
+
     const authResponse = await admin.auth().deleteUser(id)
-    const firestoreResponse = await db.collection('users').doc(id).delete()
+    const firestoreResponse = await ref.delete()
 
     const response = { authResponse, firestoreResponse }
 
