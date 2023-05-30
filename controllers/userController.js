@@ -58,17 +58,26 @@ const createUserToAuthAndFirestore = async (req, res) => {
 
 // update user
 const updateUser = async (req, res) => {
-  const { id } = req.params;
+  const { id } = req.params; // id user
   try {
     let response = {};
     const newData = JSON.parse(req.body.data);
 
     if (req.file) {
       const imgFile = req.file;
-      // Upload the image to cloud storage
-      await bucket.upload(imgFile.path, { destination: 'profiles/' + id });
-      const imgPublicURL = process.env.STORAGE_PUBLIC_URL + "/profiles/" + id;
-      newData.photoURL = imgPublicURL;
+      const destPath = `profiles/${id}/` + Date.now()
+      const [files] = await bucket.getFiles({ prefix: `profiles/${id}` })
+
+      if (files.length > 0) {
+        for (const file of files) {
+          await file.delete()
+        }
+      }
+
+      // Upload new image to cloud storage
+      await bucket.upload(imgFile.path, { destination: destPath, public: true })
+      const imgPublicURL = process.env.STORAGE_PUBLIC_URL + `/${destPath}`
+      newData.photoURL = imgPublicURL
 
       // delete temporary image in this express app directory (/uploads)
       fs.unlink(req.file.path, (err) => {
