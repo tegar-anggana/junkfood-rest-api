@@ -46,14 +46,11 @@ const createUserToAuthAndFirestore = async (req, res) => {
     }
 
     const authResponse = await admin.auth().createUser(user);
-    const firestoreResponse = await db.collection('users').doc(authResponse.uid).set(user)
+    await db.collection('users').doc(authResponse.uid).set(user)
 
-    const response = { ...user, authResponse, firestoreResponse }
-
-    return res.status(200).send(response)
-  } catch (error) {
-    console.log(error)
-    return res.status(500).send(error.message)
+    return res.status(200).send(user)
+  } catch (e) {
+    return res.status(500).send({ error: e.message })
   }
 }
 
@@ -61,7 +58,6 @@ const createUserToAuthAndFirestore = async (req, res) => {
 const updateUser = async (req, res) => {
   const { id } = req.params; // id user
   try {
-    let response = {};
     const newData = JSON.parse(req.body.data);
 
     if (req.file) {
@@ -92,27 +88,22 @@ const updateUser = async (req, res) => {
       const userRef = db.collection('users').doc(id);
 
       // Update Firestore data
-      const firestoreResponse = await userRef.update(newData);
+      await userRef.update(newData);
 
       // Update user authentication information if email or password is provided
-      let authResponse = "";
       if (newData.email || newData.password) {
-        authResponse = await admin.auth().updateUser(id, {
+        await admin.auth().updateUser(id, {
           email: newData.email,
           password: newData.password
         });
       }
 
-      response.authResponse = authResponse;
-      response.firestoreResponse = firestoreResponse;
-
-      return res.status(200).send(response);
+      return res.status(200).send({ message: "User successfully updated." });
     }
 
-    return res.status(400).send('No data provided for update.');
-  } catch (error) {
-    console.error(error);
-    return res.status(500).send(error.message);
+    return res.status(400).send({ message: 'No data provided for update.' });
+  } catch (e) {
+    return res.status(500).send({ error: e.message });
   }
 }
 
@@ -134,15 +125,12 @@ const deleteUserInAuthAndFirestore = async (req, res) => {
       await bucket.file(`profiles/${id}/${desiredSeg}`).delete()
     }
 
-    const authResponse = await admin.auth().deleteUser(id)
-    const firestoreResponse = await ref.delete()
+    await admin.auth().deleteUser(id)
+    await ref.delete()
 
-    const response = { authResponse, firestoreResponse }
-
-    return res.status(200).send(response)
-  } catch (error) {
-    console.log(error)
-    return res.status(500).send(error.message)
+    return res.status(200).send({ message: "User successfully deleted." })
+  } catch (e) {
+    return res.status(500).send({ error: e.message })
   }
 }
 

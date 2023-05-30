@@ -22,7 +22,7 @@ router.get('/', getHistories)
 router.put('/user/:userId/:histId', upload.single('image'), updateHistory)
 
 // Delete satu history
-router.delete('/:id', deleteHistory)
+router.delete('/user/:userId/:histId', deleteHistory)
 
 
 module.exports = router

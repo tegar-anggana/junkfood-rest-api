@@ -30,16 +30,15 @@ const createHistory = async (req, res) => {
 
     if (history) {
       const historyData = { user_id: id, ...history }
-      const firestoreResponse = await db.collection('histories').doc(historyId).set(historyData)
-      response = { id: historyId, ...historyData, firestoreResponse }
+      await db.collection('histories').doc(historyId).set(historyData)
+      response = { id: historyId, ...historyData }
 
       return res.status(200).send(response)
     }
 
     return res.status(400).send('No data provided for history creation.')
-  } catch (error) {
-    console.log(error)
-    return res.status(500).send(error.message)
+  } catch (e) {
+    return res.status(500).send({ error: e.message })
   }
 }
 
@@ -51,13 +50,11 @@ const getUserHistory = async (req, res) => {
     const snapshot = await historyRef.where('user_id', '==', id).get();
     let histories = []
     snapshot.forEach(doc => {
-      // console.log(doc.id, '=>', doc.data());
       histories.push({ id: doc.id, ...doc.data() })
     });
     return res.status(200).send(histories)
-  } catch (error) {
-    console.log(error)
-    return res.status(500).send(error.message)
+  } catch (e) {
+    return res.status(500).send({ error: e.message })
   }
 }
 
@@ -68,13 +65,11 @@ const getHistories = async (req, res) => {
     const snapshot = await historiesRef.get()
     let histories = []
     snapshot.forEach(doc => {
-      // console.log(doc.id, '=>', doc.data());
       histories.push({ id: doc.id, ...doc.data() })
     });
     return res.status(200).send(histories)
-  } catch (error) {
-    console.log(error)
-    return res.status(500).send(error.message)
+  } catch (e) {
+    return res.status(500).send({ error: e.message })
   }
 }
 
@@ -82,7 +77,6 @@ const getHistories = async (req, res) => {
 const updateHistory = async (req, res) => {
   const { userId, histId } = req.params
   try {
-    let response = {}
     const newData = JSON.parse(req.body.data)
 
     if (req.file) {
@@ -111,37 +105,32 @@ const updateHistory = async (req, res) => {
 
     if (newData) {
       const historyRef = db.collection('histories').doc(histId)
-      const firestoreResponse = await historyRef.update(newData)
-      response = { firestoreResponse }
-      return res.status(200).send(response)
+      await historyRef.update(newData)
+      return res.status(200).send({ message: "History successfully updated." })
     }
 
     return res.status(400).send('No data provided for update.')
-  } catch (error) {
-    console.log(error)
-    return res.status(500).send(error.message)
+  } catch (e) {
+    return res.status(500).send({ error: e.message })
   }
 }
 
 // Delete satu history
 const deleteHistory = async (req, res) => {
-  const { id } = req.params // id history, bukan id user
+  const { userId, histId } = req.params
   try {
-    const ref = db.collection('histories').doc(id)
+    const ref = db.collection('histories').doc(histId)
     const data = await ref.get()
 
     if (data.data().photoURL) {
-      await bucket.file('histories/' + id).delete()
+      await bucket.file(`histories/${userId}/${histId}`).delete()
     }
 
-    const firestoreResponse = await ref.delete()
+    await ref.delete()
 
-    const response = { firestoreResponse }
-
-    return res.status(200).send(response)
-  } catch (error) {
-    console.log(error)
-    return res.status(500).send(error.message)
+    return res.status(200).send({ message: "History successfully deleted." })
+  } catch (e) {
+    return res.status(500).send({ error: e.message })
   }
 }
 

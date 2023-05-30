@@ -18,10 +18,6 @@ app.use((req, res, next) => {
 // routes
 app.use('/api/user', userRoutes)
 app.use('/api/history', historyRoutes)
-app.get('/api/scan', (req, res) => {
-  const imgurl = req.params
-  return res.status(200).json("halo")
-})
 
 // NYOBA
 // const requireAuth = require('./middleware/requireAuth')
