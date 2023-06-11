@@ -38,11 +38,15 @@ const getUser = async (req, res) => {
 // signup user
 const createUserToAuthAndFirestore = async (req, res) => {
   try {
-    const { name, email, password } = req.body
+    const { name, email, password, gender, weight_kg, height_cm, birth_date } = req.body
     const user = {
       name: name,
       email: email,
-      password: password
+      password: password,
+      gender: gender,
+      weight_kg: weight_kg,
+      height_cm: height_cm,
+      birth_date: birth_date
     }
 
     const authResponse = await admin.auth().createUser(user);
