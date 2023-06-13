@@ -80,9 +80,13 @@ app.post('/api/exercise/recommendation', async (req, res) => {
     });
 
     recommendations.sort((a, b) => a.jarak - b.jarak);
-    const topRecommendations = recommendations.slice(0, 5);
+    const topRecommendations = recommendations.slice(0, 10);
     // return topRecommendations;
-    return res.status(200).send(topRecommendations)
+    return res.status(200).send(topRecommendations.map(e => ({
+      exercise: e.exercise,
+      calorie: e.calorie,
+      time_minute: exercise_time_minute
+    })))
 
   } catch (e) {
     return res.status(500).send({ error: e.message })
