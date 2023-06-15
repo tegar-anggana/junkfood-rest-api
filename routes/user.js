@@ -1,11 +1,12 @@
 const express = require('express')
+const os = require('os');
 
 const { createUserToAuthAndFirestore, deleteUserInAuthAndFirestore, getUser, getUsers, updateUser } = require('../controllers/userController')
 const requireAuth = require('../middleware/requireAuth')
 const multer = require('multer')
 
 const router = express.Router()
-const upload = multer({ dest: 'tmp/' })
+const upload = multer({ dest: os.tmpdir() })
 
 // login route
 // router.post('/login', loginUser)
