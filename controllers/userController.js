@@ -81,11 +81,11 @@ const updateUser = async (req, res) => {
       newData.photoURL = imgPublicURL
 
       // delete temporary image in this express app directory (/tmp)
-      fs.unlink(req.file.path, (err) => {
-        if (err) {
-          console.log(err)
-        }
-      })
+      // fs.unlink(req.file.path, (err) => {
+      //   if (err) {
+      //     console.log(err)
+      //   }
+      // })
     }
 
     if (newData) {
