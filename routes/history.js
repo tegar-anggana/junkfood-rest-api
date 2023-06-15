@@ -4,7 +4,8 @@ const { createHistory, getUserHistory, getHistories, updateHistory, deleteHistor
 const multer = require('multer')
 
 const router = express.Router()
-const upload = multer({ dest: 'uploads/' })
+// const upload = multer({ dest: 'uploads/' })
+const upload = multer()
 
 // require auth for all history routes
 router.use(requireAuth)

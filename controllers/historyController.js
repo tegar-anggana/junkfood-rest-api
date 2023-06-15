@@ -1,6 +1,7 @@
 // import admin from './firebase-service';
 const { db, bucket } = require('../firebase/firebase-service')
 const fs = require('fs')
+const { Readable } = require('stream')
 const { v4: uuidv4 } = require('uuid')
 
 // Buat history junk food / history activity
@@ -16,16 +17,22 @@ const createHistory = async (req, res) => {
       // upload img ke cloud storage
       const imgFile = req.file
       const destPath = `histories/${id}/${historyId}/` + Date.now()
-      await bucket.upload(imgFile.path, { destination: destPath, public: true })
+
+      // Upload new image to cloud storage
+      const fileStream = new Readable();
+      fileStream.push(imgFile.buffer);
+      fileStream.push(null);
+
+      // Upload the file to Google Cloud Storage
+      const file = bucket.file(destPath);
+      await new Promise((resolve, reject) => {
+        fileStream.pipe(file.createWriteStream({ resumable: false }))
+          .on('error', reject)
+          .on('finish', resolve);
+      });
+      // await bucket.upload(imgFile.path, { destination: destPath, public: true })
       const imgPublicURL = process.env.STORAGE_PUBLIC_URL + `/${destPath}`
       history.photoURL = imgPublicURL
-
-      // delete temporary file di express app directory
-      fs.unlink(req.file.path, (err) => {
-        if (err) {
-          console.log(err)
-        }
-      })
     }
 
     if (history) {
@@ -91,16 +98,21 @@ const updateHistory = async (req, res) => {
         }
       }
 
-      await bucket.upload(imgFile.path, { destination: destPath, public: true })
+      // Upload new image to cloud storage
+      const fileStream = new Readable();
+      fileStream.push(imgFile.buffer);
+      fileStream.push(null);
+
+      // Upload the file to Google Cloud Storage
+      const file = bucket.file(destPath);
+      await new Promise((resolve, reject) => {
+        fileStream.pipe(file.createWriteStream({ resumable: false }))
+          .on('error', reject)
+          .on('finish', resolve);
+      });
+      // await bucket.upload(imgFile.path, { destination: destPath, public: true })
       const imgPublicURL = process.env.STORAGE_PUBLIC_URL + `/${destPath}`
       newData.photoURL = imgPublicURL
-
-      // delete temporary image in express dir
-      fs.unlink(req.file.path, (err) => {
-        if (err) {
-          console.log(err)
-        }
-      })
     }
 
     if (newData) {

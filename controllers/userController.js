@@ -92,13 +92,6 @@ const updateUser = async (req, res) => {
 
       const imgPublicURL = process.env.STORAGE_PUBLIC_URL + `/${destPath}`
       newData.photoURL = imgPublicURL
-
-      // delete temporary image in this express app directory (/tmp)
-      // fs.unlink(req.file.path, (err) => {
-      //   if (err) {
-      //     console.log(err)
-      //   }
-      // })
     }
 
     if (newData) {
