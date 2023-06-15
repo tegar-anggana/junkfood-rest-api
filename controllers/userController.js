@@ -1,5 +1,6 @@
 const { admin, db, bucket } = require('../firebase/firebase-service')
 const fs = require('fs')
+const { Readable } = require('stream')
 const { URL } = require('url')
 
 // get all user
@@ -76,8 +77,19 @@ const updateUser = async (req, res) => {
       }
 
       // Upload new image to cloud storage
+      const fileStream = new Readable();
+      fileStream.push(imgFile.buffer);
+      fileStream.push(null);
+
+      // Upload the file to Google Cloud Storage
+      const file = bucket.file(destPath);
+      await new Promise((resolve, reject) => {
+        fileStream.pipe(file.createWriteStream({ resumable: false }))
+          .on('error', reject)
+          .on('finish', resolve);
+      });
       // await bucket.upload(imgFile.path, { destination: destPath, public: true })
-      await bucket.upload(imgFile.buffer, { destination: destPath, public: true })
+
       const imgPublicURL = process.env.STORAGE_PUBLIC_URL + `/${destPath}`
       newData.photoURL = imgPublicURL
 
