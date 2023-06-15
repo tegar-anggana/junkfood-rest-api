@@ -76,7 +76,8 @@ const updateUser = async (req, res) => {
       }
 
       // Upload new image to cloud storage
-      await bucket.upload(imgFile.path, { destination: destPath, public: true })
+      // await bucket.upload(imgFile.path, { destination: destPath, public: true })
+      await bucket.upload(imgFile.buffer, { destination: destPath, public: true })
       const imgPublicURL = process.env.STORAGE_PUBLIC_URL + `/${destPath}`
       newData.photoURL = imgPublicURL
 
