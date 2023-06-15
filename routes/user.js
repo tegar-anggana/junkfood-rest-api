@@ -6,7 +6,7 @@ const requireAuth = require('../middleware/requireAuth')
 const multer = require('multer')
 
 const router = express.Router()
-const upload = multer({ dest: os.tmpdir() })
+const upload = multer({ dest: os.tmpdir() + '/' })
 
 // login route
 // router.post('/login', loginUser)
